@@ -1,0 +1,176 @@
+/* ######################################## General ########################################*/
+
+
+.background {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: #ececec;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+
+.hello_msg {
+    text-align: center;
+    font-family: "Century Gothic", sans-serif;
+    color: #115740;
+    font-size: 7vmax;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.sub_hello_txt {
+    text-align: center;
+    font-family: "Century Gothic", sans-serif;
+    color: #B9975B;
+    font-size: 2vmax;
+    font-weight: bold;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.centered_div {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.floating_buttons {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.arc_button { /* INSPECT */
+    position: absolute;
+    background: #115740;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 7vmax;
+    height: 7vmax;
+    font-family: "Century Gothic", sans-serif;
+    font-size: 1.5vmax;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    pointer-events: auto; /* Re-enable clicks for buttons */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.arc_button:hover {
+    transform: translate(-50%, -50%), scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.button_1 {
+    top: 30%;
+    left: 65%;
+    transform: translate(-50%, -50%);
+}
+
+.button_2 {
+    top: 70%;
+    left: 65%;
+    transform: translate(-50%, -50%);
+}
+
+.button_4 {
+    top: 70%;
+    left: 35%;
+    transform: translate(-50%, -50%);
+}
+
+.button_5 {
+    top: 30%;
+    left: 35%;
+    transform: translate(-50%, -50%);
+}
+
+.button_sub {
+    width: 6vmax;
+    height: 6vmax;
+    top: 7.5%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+/* ######################################## Desktop ########################################*/
+
+
+/* Initially hide desktop-specific elements */
+
+
+/* ######################################## Mobile ########################################*/
+
+
+/* Initially hide mobile-specific elements */
+
+
+/* ######################################## Utility ########################################*/
+
+
+.only_mobile {
+    display: none;
+}
+
+.only_desktop {
+    display: block;
+}
+
+@media (max-width: 768px) {
+
+    .only_mobile {
+        display: block;
+    }
+
+    .only_desktop {
+        display: none;
+    }
+
+.button_1 {
+    top: 92.5%;
+    left: 85%;
+    transform: translate(-50%, -50%);
+}
+
+.button_2 {
+    top: 92.5%;
+    left: 62%;
+    transform: translate(-50%, -50%);
+}
+
+.button_4 {
+    top: 92.5%;
+    left: 38%;
+    transform: translate(-50%, -50%);
+}
+
+.button_5 {
+    top: 92.5%;
+    left: 15%;
+    transform: translate(-50%, -50%);
+}
+
+.button_sub {
+    width: 7vmax;
+    height: 7vmax;
+    top: 92.5%;
+    left: 15%;
+    transform: translate(-50%, -50%);
+}
+
+.hello_msg {
+    font-size: 5vmax;
+}
+
+.sub_hello_txt {
+    font-size: 1.5vmax;
+}
+}
