@@ -5,7 +5,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    background-color: #ececec;
+    background-color: rgb(229, 226, 226);
     height: 100vh;
     width: 100vw;
     overflow: hidden;
@@ -19,6 +19,7 @@
     font-size: 7vmax;
     margin-top: 0px;
     margin-bottom: 0px;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .sub_hello_txt {
@@ -29,6 +30,7 @@
     font-weight: bold;
     margin-top: 0px;
     margin-bottom: 0px;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .centered_div {
@@ -66,41 +68,45 @@
 }
 
 .arc_button:hover {
-    transform: translate(-50%, -50%), scale(1.1);
+    transform: translate(-50%, -50%), scale(1.5);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .button_1 {
-    top: 30%;
-    left: 65%;
+    top: 20%;
+    left: 5%;
     transform: translate(-50%, -50%);
 }
 
 .button_2 {
-    top: 70%;
-    left: 65%;
+    top: 35%;
+    left: 5%;
+    transform: translate(-50%, -50%);
+}
+
+.button_3 {
+    top: 50%;
+    left: 5%;
     transform: translate(-50%, -50%);
 }
 
 .button_4 {
-    top: 70%;
-    left: 35%;
+    top: 65%;
+    left: 5%;
     transform: translate(-50%, -50%);
 }
 
 .button_5 {
-    top: 30%;
-    left: 35%;
+    top: 80%;
+    left: 5%;
     transform: translate(-50%, -50%);
 }
 
-.button_sub {
-    width: 6vmax;
-    height: 6vmax;
-    top: 7.5%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+.button_home {
+    background: #115740;
+    border: #B9975B 0.5vmax solid;
 }
+
 /* ######################################## Desktop ########################################*/
 
 
@@ -124,8 +130,42 @@
     display: block;
 }
 
-@media (max-width: 768px) {
+@media (max-height: 768px) {
+    /* Mobile Landscape */
+    .button_1 {
+        width: 6vmax;
+        height: 6vmax;
+        font-size: 1.3vmax;
+    }
 
+    .button_2 {
+        width: 6vmax;
+        height: 6vmax;
+        font-size: 1.3vmax;
+    }
+
+    .button_3 {
+        width: 6vmax;
+        height: 6vmax;
+        font-size: 1.3vmax;
+    }
+
+    .button_4 {
+        width: 6vmax;
+        height: 6vmax;
+        font-size: 1.3vmax;
+    }
+
+    .button_5 {
+        width: 6vmax;
+        height: 6vmax;
+        font-size: 1.3vmax;
+    }
+}
+
+
+@media (max-width: 768px) {
+    /* Mobile Portrait */
     .only_mobile {
         display: block;
     }
@@ -134,43 +174,41 @@
         display: none;
     }
 
-.button_1 {
-    top: 92.5%;
-    left: 85%;
-    transform: translate(-50%, -50%);
-}
+    .button_1 {
+        top: 92.5%;
+        left: 15%;
+        transform: translate(-50%, -50%);
+    }
 
-.button_2 {
-    top: 92.5%;
-    left: 62%;
-    transform: translate(-50%, -50%);
-}
+    .button_2 {
+        top: 92.5%;
+        left: 32.5%;
+        transform: translate(-50%, -50%);
+    }
 
-.button_4 {
-    top: 92.5%;
-    left: 38%;
-    transform: translate(-50%, -50%);
-}
+    .button_3 {
+        top: 92.5%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
 
-.button_5 {
-    top: 92.5%;
-    left: 15%;
-    transform: translate(-50%, -50%);
-}
+    .button_4 {
+        top: 92.5%;
+        left: 67.5%;
+        transform: translate(-50%, -50%);
+    }
 
-.button_sub {
-    width: 7vmax;
-    height: 7vmax;
-    top: 92.5%;
-    left: 15%;
-    transform: translate(-50%, -50%);
-}
+    .button_5 {
+        top: 92.5%;
+        left: 85%;
+        transform: translate(-50%, -50%);
+    }
 
-.hello_msg {
-    font-size: 5vmax;
-}
+    .hello_msg {
+        font-size: 5vmax;
+    }
 
-.sub_hello_txt {
-    font-size: 1.5vmax;
-}
+    .sub_hello_txt {
+        font-size: 1.5vmax;
+    }
 }
