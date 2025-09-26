@@ -195,10 +195,10 @@
     }
 
     .floating_buttons {
-        top: 90vh;
+        top: 80vh;
         left: 0;
         width: 100vw;
-        height: 10vh;
+        height: 20vh;
         pointer-events: none;
         z-index: 10;
         border-right: None;
@@ -236,10 +236,10 @@
     }
 
     .hello_msg {
-        font-size: 5vmax;
+        font-size: 7vmax;
     }
 
     .sub_hello_txt {
-        font-size: 1.5vmax;
+        font-size: 2vmax;
     }
 }
