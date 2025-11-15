@@ -1,0 +1,147 @@
+/* ######################################## Variables ########################################*/
+
+
+:root {
+    /* Colors */
+    --main-bg-color: rgb(229, 226, 226);
+    --color1: #115740;
+    --color2: #B9975B;
+
+    /* Text Formatting */
+    --font-family: "Century Gothic", sans-serif;
+    --txt-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+
+    /* Text Sizes, Line Height, Margin */
+    --hello-font-size: 7vmax;
+    --sub-hello-font-size: 2vmax;
+    --about-me-font-size: 2vmax;
+    --about-me-line-height: 7vh;
+    --about-me-margin-top: 5vh;
+
+    /* Translations */
+    --center-x: translateX(-50%);
+    --center-y: translateY(-50%);
+    --center-both: translate(-50%, -50%);
+}
+
+
+/* ######################################## General ########################################*/
+
+
+.img-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 5vh;
+}
+
+.img-row img {
+    max-width: 30%;
+    height: auto;
+    flex: 1 1 0;
+    border: var(--color2) solid 0.5vmax;
+    border-radius: 10%;
+}
+
+.about_me_txt {
+    text-align: left;
+    line-height: var(--about-me-line-height);
+    font-family: var(--font-family);
+    color: #202020;
+    font-size: var(--about-me-font-size);
+    margin-top: var(--about-me-margin-top);
+    margin-bottom: 0px;
+    text-shadow: var(--txt-shadow);
+}
+
+.about_div {
+    position: relative;
+    display: block;
+    top: 5%;
+    left: 55%;
+    width: 75vw;
+    margin-bottom: 10vh;
+    transform: var(--center-x);
+}
+
+.profile_pic {
+    display: block;
+    margin: 1rem auto;
+    width: 15vmax;
+    height: 20vmax;
+    margin-bottom: 5vh;
+    border-radius: 10%;
+    border: var(--color2) solid 0.5vmax;
+    box-shadow: var(--txt-shadow);
+}
+
+
+/* ######################################## Desktop ########################################*/
+
+
+/* Initially hide desktop-specific elements */
+
+
+/* ######################################## Mobile ########################################*/
+
+
+/* Initially hide mobile-specific elements */
+
+
+/* ######################################## Utility ########################################*/
+
+
+@media (max-height: 768px) {
+    /* Mobile Landscape */
+    
+    .profile_pic {
+    width:22.5vmax;
+    height: 30vmax;
+    margin-bottom: 6vh;
+    }
+
+    .about_me_txt {
+        margin-top: 0px;
+        line-height: 8vh;
+    }
+}
+
+
+@media (max-width: 768px) {
+    /* Mobile Portrait */
+    
+    .img-row {
+        flex-direction: column;
+        align-items: stretch;
+        margin-top: 0vh;
+    }
+
+    .img-row img {
+        max-width: 100%;
+    }
+
+    .about_div {
+        top: 5%;
+        left: 50%;
+        width: 80vw;
+        transform: var(--center-x);
+        margin-bottom: 25vh;
+    }
+
+    body {
+        padding-bottom: calc(20svh + env(safe-area-inset-bottom, 0px));
+    }
+
+    .about_me_txt {
+        font-size: 1.7vmax;
+        margin-top: 0px;
+        line-height: 3vh;
+    }
+
+    .profile_pic {
+    width:22.5vmax;
+    height: 30vmax;
+    margin-bottom: 3vh;
+    }
+}
