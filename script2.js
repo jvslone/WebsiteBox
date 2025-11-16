@@ -1,5 +1,5 @@
 let myCnnModel;
-const CLASSES = ['Bird', 'Cat', 'Fish', 'Horse', 'Rabbit'];
+const CLASSES = ['Bird', 'Cat', 'Fish', 'Horse', 'Rabbit', 'Penguin'];
 
 function updateLogitsBar(logitsArray) {
     const container = document.getElementById('logits-readout');
@@ -64,7 +64,7 @@ async function classifyDrawing(pixelData) {
         const maxVal = (await inputTensor.max().data())[0];
         if (maxVal === 0 || isNaN(maxVal)) {
             console.log("Empty canvas detected.");
-            logits = [0, 0, 0, 0, 0];
+            logits = [0, 0, 0, 0, 0, 0];
             label = 0; // default to Bird
             inputTensor.dispose();
         } else {
@@ -79,7 +79,7 @@ async function classifyDrawing(pixelData) {
             if (nonZeroCoords.length === 0) {
                 // Fallback: treat as empty just in case
                 console.log("No non-zero pixels found.");
-                logits = [0, 0, 0, 0, 0];
+                logits = [0, 0, 0, 0, 0, 0];
                 label = 0;
                 inputTensor.dispose();
             } else {
@@ -136,7 +136,7 @@ async function classifyDrawing(pixelData) {
         }
     } catch (e) {
         console.error("Error during classifyDrawing:", e);
-        logits = [0, 0, 0, 0, 0];
+        logits = [0, 0, 0, 0, 0, 0];
         label = 0;
     }
 
