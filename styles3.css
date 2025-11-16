@@ -1,0 +1,193 @@
+/* ######################################## Variables ########################################*/
+
+
+:root {
+    /* Colors */
+    --main-bg-color: rgb(229, 226, 226);
+    --color1: #115740;
+    --color2: #B9975B;
+
+    /* Text Formatting */
+    --font-family: "Century Gothic", sans-serif;
+    --txt-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+
+    /* Text Sizes, Line Height, Margin */
+    --hello-font-size: 7vmax;
+    --sub-hello-font-size: 2vmax;
+    --about-me-font-size: 2vmax;
+    --about-me-line-height: 7vh;
+    --about-me-margin-top: 5vh;
+
+    /* Translations */
+    --center-x: translateX(-50%);
+    --center-y: translateY(-50%);
+    --center-both: translate(-50%, -50%);
+}
+
+
+/* ######################################## General ########################################*/
+
+
+.layout {
+    display: flex;
+    min-height: 100svh;
+}
+
+.stage {
+    position: fixed;
+    top: calc(10vh + 5px);
+    left: calc(10vw + 10px);
+    width: calc(90vw - 10px);
+    position: relative;
+    height: calc(80svh - 5px);
+}
+
+#flow_canvas{
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.topbar {
+    position: fixed;
+    top: 0;
+    left: calc(10vw + 10px);
+    width: calc(90vw - 10px);
+    height: 10vh;
+    background-color: var(--main-bg-color);
+    display: block;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--txt-shadow);
+    border-bottom: var(--color1) solid 5px;
+}
+
+.bottombar {
+    position: fixed;
+    top: 90vh;
+    left: calc(10vw + 10px);
+    width: calc(90vw - 10px);
+    height: 10vh;
+    background-color: var(--main-bg-color);
+    display: flex;                 /* was block */
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--txt-shadow);
+    border-top: var(--color1) solid 5px;
+    padding: 0 1.5rem;
+    text-align: center;
+    font-family: var(--font-family);
+    font-size: 1.6rem;
+}
+
+/* optional: tidy up the paragraph */
+.bottom-instructions {
+    margin: 0;
+    width: 100%;          /* fill the bar */
+    text-align: center;   /* center each line */
+}
+
+/* optional: simple "key" look for Ctrl/Z */
+.kbd {
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    border: 1px solid #999;
+    background-color: #eee;
+    font-size: 0.9em;
+}
+
+/* ######################################## Desktop ########################################*/
+
+
+/* Initially hide desktop-specific elements */
+
+
+/* ######################################## Mobile ########################################*/
+
+
+/* Initially hide mobile-specific elements */
+
+
+/* ######################################## Utility ########################################*/
+
+
+@media (max-height: 768px) {
+    /* Mobile Landscape */
+
+    .topbar, .bottombar {
+        height: 20vh;
+    }
+    .bottombar {
+        top: 80vh;
+    }
+
+    .stage {
+        top: calc(20vh + 5px);
+        height: calc(60svh - 5px);
+    }
+
+}
+
+
+@media (max-width: 768px) {
+    /* Mobile Portrait */
+
+    .layout { display: flex; flex-direction: column; min-height: 100svh; }
+
+    .stage {
+        order: -1;
+        left: 0;
+        width: 100vw;
+        position: relative;
+        height: calc(75svh - 5px);
+    }
+
+    #drawing_canvas {
+        display: block;
+        width: 100%;
+        height: 80%;
+    }
+
+    body {
+        padding-bottom: calc(20svh + env(safe-area-inset-bottom, 0px));
+    }
+
+    .topbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 12vh;                              /* a bit taller */
+        padding-top: calc(env(safe-area-inset-top, 0px) + 0.5rem);
+        box-sizing: border-box;
+    }
+
+    .bottombar {
+        position: fixed;
+        top: 70vh;          /* same vertical position you wanted */
+        left: 0;
+        right: 0;
+        width: 100%;        /* fill the whole content width */
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 0.5rem 0.75rem;
+        box-sizing: border-box;
+
+        font-family: var(--font-family);
+        font-size: 1.2rem;
+        text-align: center;
+        overflow-x: hidden; /* just in case the kbd spans get wide */
+    }
+
+    .bottom-instructions {
+        margin: 0;
+        max-width: 100%;
+        text-align: center;
+    }
+    
+}
