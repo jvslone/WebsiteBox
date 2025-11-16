@@ -10,21 +10,26 @@
 <body class="background">
     <div class="layout">
         <div class='floating_buttons'>
-                <a href='test1.html'><button class="arc_button button_1">About Me</button></a>
+                <a href='test1.html'><button class="arc_button button_1">BIO</button></a>
                 <a href='homepage.html'><button class="arc_button button_2 button_home">Home</button></a>
                 <a href='test3.html'><button class="arc_button button_3">Test3</button></a>
                 <a href='test4.html'><button class="arc_button button_4">Test4</button></a>
                 <a href='test5.html'><button class="arc_button button_5">Test5</button></a>
         </div>
         <div class="topbar">
-            .
+            <div id="logits-readout" class="logits-readout">
+        <!-- logits will be injected here -->
+            </div>
         </div>
         <div class="stage">
             <canvas id="drawing_canvas"></canvas>
             <h2 id="prediction-output">Draw a digit...</h2>
         </div>
         <div class="bottombar">
-            .
+            <p class="bottom-instructions">
+                Try drawing one of the animals above and the CNN will try to classify it.
+                Use <span class="kbd">Ctrl</span> + <span class="kbd">Z</span> to undo.
+            </p>
         </div>
     </div>
 </body>

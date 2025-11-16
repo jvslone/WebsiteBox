@@ -1,69 +1,170 @@
 let myCnnModel;
+const CLASSES = ['Bird', 'Cat', 'Fish', 'Horse', 'Rabbit'];
+
+function updateLogitsBar(logitsArray) {
+    const container = document.getElementById('logits-readout');
+    if (!container || !logitsArray) return;
+
+    const logits = Array.from(logitsArray);
+    if (logits.length !== CLASSES.length) return;
+
+    const maxVal = Math.max(...logits);
+    const maxIdx = logits.indexOf(maxVal);
+
+    container.innerHTML = '';  // clear old content
+
+    logits.forEach((val, i) => {
+        const span = document.createElement('span');
+        span.classList.add('logit-item');
+        if (i === maxIdx) span.classList.add('max-logit');
+
+        // show a few decimals so you can see changes
+        span.textContent = `${CLASSES[i]}: ${val.toFixed(3)}`;
+
+        container.appendChild(span);
+    });
+}
+
+updateLogitsBar(new Array(CLASSES.length).fill(0.0));
+
 (async () => {
-    //myCnnModel = await tf.loadLayersModel('Cnn/web_model_v4/model.json');
-    myCnnModel = await tf.loadGraphModel('tfjs_model/model.json');
-    console.log("Model loaded!");
+    try {
+        myCnnModel = await tf.loadGraphModel('tfjs_model/model.json');
+        console.log("Model loaded!");
+        const outputElement = document.getElementById('prediction-output');
+        if (outputElement) {
+            outputElement.innerText = "Model loaded. Draw a bird, cat, fish, horse, or rabbit!";
+        }
+    } catch (e) {
+        console.error("Error loading model:", e);
+        const outputElement = document.getElementById('prediction-output');
+        if (outputElement) {
+            outputElement.innerText = "Error loading model. See console.";
+        }
+    }
 })();
 
-// Function to pipe 'pix' data to the loaded TF.js model
 async function classifyDrawing(pixelData) {
     if (!myCnnModel) {
         console.log("Model not loaded yet.");
         return;
     }
 
-    // Define original and target dimensions
     const W = 512;
     const H = 512;
-    const TARGET_W = 28; // Assuming a 28x28 model
+    const TARGET_W = 28;
     const TARGET_H = 28;
 
-    // Use tf.tidy() to get both logits and the predicted label
-    const { logits, label } = tf.tidy(() => {
-        // 1. Convert pix array to a 2D Tensor
-        const inputTensor = tf.tensor(pixelData, [H, W], 'float32');
+    let logits, label;
 
-        // 2. Normalize (0..255 -> 0.0..1.0)
-        const normalizedTensor = inputTensor.div(255.0);
+    try {
+        // 1. Make input tensor and check for empty canvas
+        const inputTensor = tf.tensor(pixelData, [H, W], 'float32').div(255.0);
 
-        // 3. Reshape to 4D [1, H, W, 1]
-        const reshapedTensor = normalizedTensor.reshape([1, H, W, 1]);
+        const maxVal = (await inputTensor.max().data())[0];
+        if (maxVal === 0 || isNaN(maxVal)) {
+            console.log("Empty canvas detected.");
+            logits = [0, 0, 0, 0, 0];
+            label = 0; // default to Bird
+            inputTensor.dispose();
+        } else {
+            // 2. Find non-zero coordinates ASYNCHRONOUSLY
+            const nonZeroMask = inputTensor.greater(0);
+            const nonZeroCoordsT = await tf.whereAsync(nonZeroMask); // shape [N, 2]
+            const nonZeroCoords = await nonZeroCoordsT.array();      // JS array [[y,x], ...]
 
-        // 4. Resize to target size [1, 28, 28, 1]
-        const resizedTensor = tf.image.resizeBilinear(reshapedTensor, [TARGET_H, TARGET_W]);
-        
-        // 5. Run the prediction. This tensor *IS* the logits.
-        const logitsTensor = myCnnModel.predict(resizedTensor);
-        
-        // 6. Get the inferred label by finding the index of the highest logit
-        const labelTensor = logitsTensor.argMax(1);
+            nonZeroMask.dispose();
+            nonZeroCoordsT.dispose();
 
-        // 7. Get the raw data from the tensors
-        return {
-            logits: logitsTensor.dataSync(), // This is the full logits array
-            label: labelTensor.dataSync()[0]  // This is the single highest index
-        };
-    });
+            if (nonZeroCoords.length === 0) {
+                // Fallback: treat as empty just in case
+                console.log("No non-zero pixels found.");
+                logits = [0, 0, 0, 0, 0];
+                label = 0;
+                inputTensor.dispose();
+            } else {
+                // 3. Compute bounding box in JS
+                let yMin = H, yMax = 0, xMin = W, xMax = 0;
+                for (const [y, x] of nonZeroCoords) {
+                    if (y < yMin) yMin = y;
+                    if (y > yMax) yMax = y;
+                    if (x < xMin) xMin = x;
+                    if (x > xMax) xMax = x;
+                }
 
-    // Logits & label
+                const boxPad = 20;
+                const yMinPad = Math.max(0, yMin - boxPad);
+                const yMaxPad = Math.min(H - 1, yMax + boxPad);
+                const xMinPad = Math.max(0, xMin - boxPad);
+                const xMaxPad = Math.min(W - 1, xMax + boxPad);
+
+                let height = yMaxPad - yMinPad + 1;
+                let width  = xMaxPad - xMinPad + 1;
+                if (height <= 0) height = 1;
+                if (width  <= 0) width  = 1;
+
+                // 4. Crop, pad to square, resize, and predict
+                const croppedTensor = inputTensor.slice([yMinPad, xMinPad], [height, width]);
+
+                const maxDim = Math.max(height, width);
+                const padH = Math.floor((maxDim - height) / 2);
+                const padW = Math.floor((maxDim - width) / 2);
+
+                const paddedSquare = croppedTensor.pad(
+                    [[padH, maxDim - height - padH], [padW, maxDim - width - padW]],
+                    0
+                );
+
+                const reshaped = paddedSquare.reshape([1, maxDim, maxDim, 1]);
+                const resizedTensor = tf.image.resizeBilinear(reshaped, [TARGET_H, TARGET_W]);
+
+                const logitsT = myCnnModel.predict(resizedTensor);
+                const labelT  = logitsT.argMax(1);
+
+                logits = await logitsT.data();
+                label  = (await labelT.data())[0];
+
+                // Clean up
+                logitsT.dispose();
+                labelT.dispose();
+                resizedTensor.dispose();
+                reshaped.dispose();
+                paddedSquare.dispose();
+                croppedTensor.dispose();
+                inputTensor.dispose();
+            }
+        }
+    } catch (e) {
+        console.error("Error during classifyDrawing:", e);
+        logits = [0, 0, 0, 0, 0];
+        label = 0;
+    }
+
     console.log("Logits (raw model output):", logits);
-    console.log("Prediction (inferred label):", label);
+    const predictionName = CLASSES[label];
+    console.log("Prediction (inferred label):", label, predictionName);
 
-    // Display the final prediction on the webpage
+    // NEW: update top-bar logits display
+    updateLogitsBar(logits);
+
     const outputElement = document.getElementById('prediction-output');
     if (outputElement) {
-        outputElement.innerText = `Prediction: ${label}`;
+        outputElement.innerText = `Prediction: ${predictionName}`;
     }
 }
 
+
 // Pixel-accurate drawing
 (() => {
+    // ... (The rest of this file is unchanged) ...
     const canvas = document.getElementById('drawing_canvas');
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
     // Fixed internal pixel grid
     const W = 512, H = 512; // stored resolution
     const ON = 255; // black pixel value (0..255)
+    const OFF = 0; // white pixel value
+    const BRUSH_SIZE = 5; // Draw a 20x20 square brush
     const pix = new Uint8Array(W * H);
 
     // History stack for undo (each entry is a copy of pix before a stroke)
@@ -79,23 +180,43 @@ async function classifyDrawing(pixelData) {
     function render() {
         const data = imgData.data;
         for (let p = 0, i = 0; p < pix.length; p++, i += 4) {
-            const v = 255 - pix[p]; // white bg, black ink
+            const v = 255 - pix[p]; // white bg (0->255), black ink (255->0)
             data[i] = v; data[i+1] = v; data[i+2] = v; data[i+3] = 255;
         }
         ctx.putImageData(imgData, 0, 0);
     }
 
+    // UPDATED setPixel function for a thick brush
     function setPixel(x, y, v = ON) {
-        if (x >= 0 && y >= 0 && x < W && y < H) pix[y * W + x] = v;
+        // safety check for NaN
+        if (isNaN(x) || isNaN(y)) {
+            console.error("Invalid coordinates passed to setPixel:", x, y);
+            return;
+        }
+        for (let i = -BRUSH_SIZE; i < BRUSH_SIZE; i++) {
+            for (let j = -BRUSH_SIZE; j < BRUSH_SIZE; j++) {
+                const px = x + i;
+                const py = y + j;
+                // Check bounds
+                if (px >= 0 && py >= 0 && px < W && py < H) {
+                    pix[py * W + px] = v;
+                }
+            }
+        }
     }
 
-    // Bresenham line
+    // Bresenham line (no change needed, it calls setPixel)
     function line(x0, y0, x1, y1, v = ON) {
+        // safety check for NaN
+        if (isNaN(x0) || isNaN(y0) || isNaN(x1) || isNaN(y1)) {
+            console.error("Invalid coordinates passed to line:", x0, y0, x1, y1);
+            return;
+        }
         let dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
         let dy = -Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
         let err = dx + dy;
         while (true) {
-            setPixel(x0, y0, v);
+            setPixel(x0, y0, v); // This will now draw a 20x20 block
             if (x0 === x1 && y0 === y1) break;
             const e2 = 2 * err;
             if (e2 >= dy) { err += dy; x0 += sx; }
@@ -131,10 +252,12 @@ async function classifyDrawing(pixelData) {
     function undoLastStroke() {
         if (history.length === 0) {
             console.log("Nothing to undo.");
-            return;
+            // If history is empty, clear the canvas
+            pix.fill(OFF);
+        } else {
+            const prev = history.pop();
+            pix.set(prev);
         }
-        const prev = history.pop();
-        pix.set(prev);
         render();
         classifyDrawing(pix); // Re-classify after undo
     }
@@ -148,14 +271,20 @@ async function classifyDrawing(pixelData) {
 
         drawing = true;
         last = p;
-        setPixel(last.x, last.y);
+        setPixel(last.x, last.y); // This was the typo
         render();
     };
 
     const move  = (e) => {
         if (!drawing) return;
         const p = eventToPixel(e);
-        if (!p) return;
+        // --- NEW FIX: Check if p is null ---
+        if (!p || !last) {
+            drawing = false;
+            last = null;
+            return;
+        };
+        // --- END OF NEW FIX ---
         line(last.x, last.y, p.x, p.y);
         last = p;
         render();
@@ -172,7 +301,7 @@ async function classifyDrawing(pixelData) {
     canvas.addEventListener('mousedown', start);
     canvas.addEventListener('mousemove', move);
     canvas.addEventListener('mouseup', end);
-    //canvas.addEventListener('mouseleave', end);
+    canvas.addEventListener('mouseleave', end); // Add mouseleave to stop drawing
 
     // Touch
     canvas.addEventListener('touchstart', (e) => { e.preventDefault(); start(e); }, { passive: false });
@@ -197,6 +326,8 @@ async function classifyDrawing(pixelData) {
     });
 
     // Init white canvas
-    pix.fill(0);
+    pix.fill(OFF);
     render();
 })();
+
+console.log("Script loaded. Ready to draw and classify!");
